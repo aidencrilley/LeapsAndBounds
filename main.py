@@ -5,7 +5,7 @@ import arcade
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
 MOVEMENT_SPEED = 5
-BACKGROUND_COLOR = arcade.color.TEAL
+BACKGROUND_COLOR = arcade.color.GRAY
 GAME_TITLE = "Doggo Simulator"
 GAME_SPEED = 1/60
 
@@ -20,7 +20,7 @@ class Window(arcade.Window):
         """ Setup the game (or reset the game) """
         arcade.set_background_color(BACKGROUND_COLOR)
         self.dog_list = arcade.SpriteList()
-        self.dog_sprite = Dog("images/fox.png", scale = 2)
+        self.dog_sprite = Dog("images/dog.png", scale = 2)
         self.dog_list.append(self.dog_sprite)
 
     def on_draw(self):
