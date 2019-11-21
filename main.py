@@ -3,13 +3,13 @@ import arcade
 # Define constants
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
-BACKGROUND_COLOR = arcade.color.GRAY
+BACKGROUND_COLOR = arcade.color.BLUE_GRAY
 GAME_TITLE = "Doggo Simulator"
 GAME_SPEED = 1/60
 
-MOVEMENT_SPEED = 5
-GRAVITY = 0.5
-JUMP_SPEED = 14
+MOVEMENT_SPEED = 4
+GRAVITY = 5
+JUMP_SPEED = 4.5
 
 
 class Window(arcade.Window):
@@ -18,29 +18,40 @@ class Window(arcade.Window):
         super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, GAME_TITLE)
 
         # Sprite Lists
-        self.dog_list = None
         self.dog_sprite = None
+        self.dog_list = None
+        self.wall_list = None
 
         # Setting up the player
         self.left_pressed = False
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
-        self.physics_engine = False
+        self.physics_engine = None
 
     def setup(self):
         """ Setup the game (or reset the game) """
         arcade.set_background_color(BACKGROUND_COLOR)
         self.dog_list = arcade.SpriteList()
-        self.dog_sprite = Dog("images/dog.png", scale = 2)
+        self.wall_list = arcade.SpriteList()
+        self.dog_sprite = Dog("images/dog.png", scale=2)
         self.dog_list.append(self.dog_sprite)
 
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.dog_list, gravity_constant = GRAVITY)
+        # Creating the ground
+        for x in range(0, 1250, 800):
+            wall = arcade.Sprite("images/grass.png")
+            wall.center_x = x
+            wall.center_y = 32
+            self.wall_list.append(wall)
+
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.wall_list, GRAVITY)
 
     def on_draw(self):
         """ Called when it is time to draw the world """
         arcade.start_render()
+
         self.dog_list.draw()
+        self.wall_list.draw()
 
     def on_update(self, delta_time):
         """ Called every frame of the game (1/GAME_SPEED times per second)"""
@@ -48,7 +59,7 @@ class Window(arcade.Window):
         self.dog_sprite.change_y = 0
 
         if self.up_pressed and not self.down_pressed:
-            self.dog_sprite.change_y = MOVEMENT_SPEED
+            self.dog_sprite.change_y = JUMP_SPEED
         elif self.down_pressed and not self.up_pressed:
             self.dog_sprite.change_y = -MOVEMENT_SPEED
         if self.left_pressed and not self.right_pressed:
@@ -57,13 +68,14 @@ class Window(arcade.Window):
             self.dog_sprite.change_x = MOVEMENT_SPEED
 
         self.dog_list.update()
+        self.physics_engine.update()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
 
         if key == arcade.key.UP:
             if self.physics_engine.can_jump():
-                self.dog_sprite.change_y = JUMP_SPEED
+                self.up_pressed = True
         elif key == arcade.key.LEFT:
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
@@ -71,9 +83,8 @@ class Window(arcade.Window):
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
-
         if key == arcade.key.UP:
-            self.dog_sprite.change_y = GRAVITY
+            self.up_pressed = False
         elif key == arcade.key.LEFT:
             self.left_pressed = False
         elif key == arcade.key.RIGHT:
