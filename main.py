@@ -1,21 +1,38 @@
 import arcade
+import random
 
 # Define constants
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
 BACKGROUND_COLOR = arcade.color.BLUE_GRAY
 GAME_TITLE = "Doggo Simulator"
-GAME_SPEED = 1/60
+GAME_SPEED = 1 / 60
+
+#Game states
+
+INSTRUCTIONS_PAGE_0 = 0
+INSTRUCTIONS_PAGE_1 = 1
+GAME_RUNNING = 2
+GAME_OVER = 3
+
+SPRITE_SCALING = 0.5
+TILE_SCALING = 0.1
 
 MOVEMENT_SPEED = 4
 GRAVITY = 5
-JUMP_SPEED = 4.5
+JUMP_SPEED = 6
 
+LEFT_VIEWPORT_MARGIN = 150
+RIGHT_VIEWPORT_MARGIN = 150
+BOTTOM_VIEWPORT_MARGIN = 50
+TOP_VIEWPORT_MARGIN = 100
 
 class Window(arcade.Window):
     def __init__(self):
         """ Initialize variables """
         super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, GAME_TITLE)
+
+        self.current_state = INSTRUCTIONS_PAGE_0
 
         # Sprite Lists
         self.dog_sprite = None
@@ -29,6 +46,15 @@ class Window(arcade.Window):
         self.down_pressed = False
         self.physics_engine = None
 
+        self.view_bottom = 0
+        self.view_left = 0
+
+        self.instructions = []
+        texture = arcade.load_texture("images/instructions_0.png")
+        self.instructions.append(texture)
+
+        texture = arcade.load_texture("images/instructions_1.png")
+        self.instructions.append(texture)
     def setup(self):
         """ Setup the game (or reset the game) """
         arcade.set_background_color(BACKGROUND_COLOR)
@@ -38,20 +64,64 @@ class Window(arcade.Window):
         self.dog_list.append(self.dog_sprite)
 
         # Creating the ground
-        for x in range(0, 1250, 800):
+        for x in range(0, 1250, 64):
             wall = arcade.Sprite("images/grass.png")
             wall.center_x = x
             wall.center_y = 32
             self.wall_list.append(wall)
 
+        coordinate_list = [[256, 300],
+                           [356, 350],
+                           [456, 275],
+                           [556, 275],
+                           [656, 275],
+                           [756, 275]]
+
+        for coordinate in coordinate_list:
+            wall = arcade.Sprite("images/RTS_Crate.png", TILE_SCALING)
+            wall.position = coordinate
+            self.wall_list.append(wall)
+
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.wall_list, GRAVITY)
+
+    def draw_instructions_page(self, page_number):
+        """
+        Draw an instruction page. Load the page as an image.
+        """
+        page_texture = self.instructions[page_number]
+        arcade.draw_texture_rectangle(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2,
+                                      page_texture.width,
+                                      page_texture.height, page_texture, 0)
+    def draw_game_over(self):
+        """
+        Draw "Game over" across the screen.
+        """
+        output = "Game Over"
+        arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
+
+        output = "Click to restart"
+        arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
+
+    def draw_game(self):
+        self.dog_list.draw()
+        self.wall_list.draw()
 
     def on_draw(self):
         """ Called when it is time to draw the world """
-        arcade.start_render()
-
         self.dog_list.draw()
         self.wall_list.draw()
+
+        arcade.start_render()
+
+        if self.current_state == INSTRUCTIONS_PAGE_0:
+            self.draw_instructions_page(0)
+        elif self.current_state == INSTRUCTIONS_PAGE_1:
+            self.draw_instructions_page(1)
+        elif self.current_state == GAME_RUNNING:
+            self.draw_game()
+        else:
+            self.draw_game()
+            self.draw_game_over()
 
     def on_update(self, delta_time):
         """ Called every frame of the game (1/GAME_SPEED times per second)"""
@@ -69,6 +139,62 @@ class Window(arcade.Window):
 
         self.dog_list.update()
         self.physics_engine.update()
+
+        changed = False
+
+        # Scroll left
+        left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
+        if self.dog_sprite.left < left_boundary:
+            self.view_left -= left_boundary - self.dog_sprite.left
+            changed = True
+
+        # Scroll right
+        right_boundary = self.view_left + WINDOW_WIDTH - RIGHT_VIEWPORT_MARGIN
+        if self.dog_sprite.right > right_boundary:
+            self.view_left += self.dog_sprite.right - right_boundary
+            changed = True
+
+        # Scroll up
+        top_boundary = self.view_bottom + WINDOW_HEIGHT - TOP_VIEWPORT_MARGIN
+        if self.dog_sprite.top > top_boundary:
+            self.view_bottom += self.dog_sprite.top - top_boundary
+            changed = True
+
+        # Scroll down
+        bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
+        if self.dog_sprite.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.dog_sprite.bottom
+            changed = True
+
+        if changed:
+            # Only scroll to integers. Otherwise we end up with pixels that
+            # don't line up on the screen
+            self.view_bottom = int(self.view_bottom)
+            self.view_left = int(self.view_left)
+
+            # Do the scrolling
+            arcade.set_viewport(self.view_left,
+                                WINDOW_WIDTH + self.view_left,
+                                self.view_bottom,
+                                WINDOW_HEIGHT + self.view_bottom)
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        """
+        Called when the user presses a mouse button.
+        """
+
+        # Change states as needed.
+        if self.current_state == INSTRUCTIONS_PAGE_0:
+            # Next page of instructions.
+            self.current_state = INSTRUCTIONS_PAGE_1
+        elif self.current_state == INSTRUCTIONS_PAGE_1:
+            # Start the game
+            self.setup()
+            self.current_state = GAME_RUNNING
+        elif self.current_state == GAME_OVER:
+            # Restart the game.
+            self.setup()
+            self.current_state = GAME_RUNNING
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -90,6 +216,22 @@ class Window(arcade.Window):
         elif key == arcade.key.RIGHT:
             self.right_pressed = False
 
+
+def on_mouse_press(self, x, y, button, modifiers):
+    if self.current_state == INSTRUCTIONS_PAGE_0:
+        self.current_state = INSTRUCTIONS_PAGE_1
+    elif self.current_state == INSTRUCTIONS_PAGE_1:
+        self.setup()
+        self.current_state = GAME_RUNNING
+    elif self.current_state == GAME_OVER:
+        self.setup()
+        self.current_state = GAME_RUNNING
+
+def update(self, delta_time):
+    if self.current_state == GAME_RUNNING:
+        self.dog_list.update()
+
+        hit_list = arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)
 
 class Dog(arcade.Sprite):
     def update(self):
