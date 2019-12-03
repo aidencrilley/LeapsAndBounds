@@ -1,5 +1,6 @@
-import arcade
 import random
+
+import arcade
 
 # Define constants
 WINDOW_WIDTH = 500
@@ -8,7 +9,7 @@ BACKGROUND_COLOR = arcade.color.BLUE_GRAY
 GAME_TITLE = "Doggo Simulator"
 GAME_SPEED = 1 / 60
 
-#Game states
+# Game states
 
 INSTRUCTIONS_PAGE_0 = 0
 INSTRUCTIONS_PAGE_1 = 1
@@ -26,6 +27,7 @@ LEFT_VIEWPORT_MARGIN = 150
 RIGHT_VIEWPORT_MARGIN = 150
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
+
 
 class Window(arcade.Window):
     def __init__(self):
@@ -55,6 +57,7 @@ class Window(arcade.Window):
 
         texture = arcade.load_texture("images/instructions_1.png")
         self.instructions.append(texture)
+
     def setup(self):
         """ Setup the game (or reset the game) """
         arcade.set_background_color(BACKGROUND_COLOR)
@@ -65,17 +68,17 @@ class Window(arcade.Window):
 
         # Creating the ground
         for x in range(0, 1250, 64):
-            wall = arcade.Sprite("images/grass.png")
+            wall = arcade.Sprite("images/grass.png", SPRITE_SCALING)
             wall.center_x = x
             wall.center_y = 32
             self.wall_list.append(wall)
 
-        coordinate_list = [[256, 300],
-                           [356, 350],
-                           [456, 275],
-                           [556, 275],
-                           [656, 275],
-                           [756, 275]]
+        coordinate_list = [[256, random.randint(100, 500)],
+                           [356, random.randint(100, 500)],
+                           [456, random.randint(100, 500)],
+                           [556, random.randint(100, 500)],
+                           [656, random.randint(100, 500)],
+                           [756, random.randint(100, 500)]]
 
         for coordinate in coordinate_list:
             wall = arcade.Sprite("images/RTS_Crate.png", TILE_SCALING)
@@ -92,6 +95,7 @@ class Window(arcade.Window):
         arcade.draw_texture_rectangle(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2,
                                       page_texture.width,
                                       page_texture.height, page_texture, 0)
+
     def draw_game_over(self):
         """
         Draw "Game over" across the screen.
@@ -227,11 +231,23 @@ def on_mouse_press(self, x, y, button, modifiers):
         self.setup()
         self.current_state = GAME_RUNNING
 
+
 def update(self, delta_time):
     if self.current_state == GAME_RUNNING:
         self.dog_list.update()
 
         hit_list = arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)
+
+    for wall in self.wall_list:
+
+        if wall.boundary_right and wall.right > wall.boundary_right and wall.change_x > 0:
+            wall.change_x *= -1
+        if wall.boundary_left and wall.left < wall.boundary_left and wall.change_x < 0:
+            wall.change_x *= -1
+        if wall.boundary_top and wall.top > wall.boundary_top and wall.change_y > 0:
+            wall.change_y *= -1
+        if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
+            wall.change_y *= -1
 
 class Dog(arcade.Sprite):
     def update(self):
