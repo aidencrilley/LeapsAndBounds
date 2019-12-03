@@ -238,11 +238,6 @@ class Dog(arcade.Sprite):
         self.center_x += self.change_x
         self.center_y += self.change_y
 
-        if self.left < 0:
-            self.left = 0
-        elif self.right > WINDOW_WIDTH - 1:
-            self.right = WINDOW_WIDTH - 1
-
         if self.bottom < 0:
             self.bottom = 0
         elif self.top > WINDOW_HEIGHT - 1:
