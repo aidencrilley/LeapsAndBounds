@@ -22,7 +22,7 @@ CANDY_SCALING = 0.5
 
 MOVEMENT_SPEED = 5
 GRAVITY = 10
-JUMP_SPEED =  15
+JUMP_SPEED = 15
 
 LEFT_VIEWPORT_MARGIN = 150
 RIGHT_VIEWPORT_MARGIN = 150
@@ -78,6 +78,7 @@ class Window(arcade.Window):
         self.score = 0
 
         arcade.set_background_color(BACKGROUND_COLOR)
+
         self.dog_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.candy_list = arcade.SpriteList()
@@ -87,7 +88,7 @@ class Window(arcade.Window):
         self.dog_list.append(self.dog_sprite)
 
         # Creating the ground
-        for x in range(0, 1250, 64):
+        for x in range(0, 50000, 64):
             wall = arcade.Sprite("images/grass.png", SPRITE_SCALING)
             wall.center_x = x
             wall.center_y = 32
@@ -105,10 +106,10 @@ class Window(arcade.Window):
             wall.position = coordinate
             self.wall_list.append(wall)
 
-        for x in range(0, 1250, 64):
+        for x in range(50):
             candy = arcade.Sprite("images/eyecandy_1.png", CANDY_SCALING)
-            candy.center_x = x
-            candy.center_y = 96
+            candy.center_x = random.randrange(500)
+            candy.center_y = random.randrange(500)
             self.candy_list.append(candy)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.wall_list, GRAVITY)
@@ -135,6 +136,10 @@ class Window(arcade.Window):
     def draw_game(self):
         self.dog_list.draw()
         self.wall_list.draw()
+        self.candy_list.draw()
+
+        score_text = f"Score: {self.score}"
+        arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
 
     def on_draw(self):
         """ Called when it is time to draw the world """
@@ -154,9 +159,6 @@ class Window(arcade.Window):
             self.draw_game()
             self.draw_game_over()
 
-        score_text = f"Score: {self.score}"
-        arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
-
     def on_update(self, delta_time):
         """ Called every frame of the game (1/GAME_SPEED times per second)"""
         self.dog_sprite.change_x = 0
@@ -173,12 +175,15 @@ class Window(arcade.Window):
 
         self.dog_list.update()
         self.physics_engine.update()
+        self.candy_list.update()
 
-        if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)) > 0:
-            self.draw_game_over()
+        candy_hit_list = arcade.check_for_collision_with_list(self.dog_sprite, self.candy_list)
 
-       # for wall in wall_hit_list:
-        #    self.score += 1
+        # Loop through each colliding sprite, remove it, and add to the score.
+        for candy in candy_hit_list:
+            candy.remove_from_sprite_lists()
+            arcade.play_sound(self.collect_candy_sound)
+            self.score += 1
 
         changed = False
 
@@ -272,8 +277,17 @@ def on_mouse_press(self, x, y, button, modifiers):
 def update(self, delta_time):
     if self.current_state == GAME_RUNNING:
         self.dog_list.update()
+        self.candy_list.update()
 
-        hit_list = arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)
+        hit_list = arcade.check_for_collision_with_list(self.dog_sprite, self.candy_list)
+
+        # Loop through each coin we hit (if any) and remove it
+        for candy in hit_list:
+            # Remove the candy
+            candy.kill()
+            # Play a sound
+            arcade.play_sound(self.collect_candy_sound)
+            self.score += 1
 
     for wall in self.wall_list:
 
@@ -286,16 +300,6 @@ def update(self, delta_time):
         if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
             wall.change_y *= -1
 
-    candy_hit_list = arcade.check_for_collision_with_list(self.dog_sprite,
-                                                         self.candy_list)
-
-    # Loop through each coin we hit (if any) and remove it
-    for candy in candy_hit_list:
-        # Remove the candy
-        candy.remove_from_sprite_lists()
-        # Play a sound
-        arcade.play_sound(self.collect_candy_sound)
-        self.score += 1
 
 class Dog(arcade.Sprite):
     def update(self):
