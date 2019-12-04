@@ -18,10 +18,11 @@ GAME_OVER = 3
 
 SPRITE_SCALING = 0.5
 TILE_SCALING = 0.1
+CANDY_SCALING = 0.5
 
-MOVEMENT_SPEED = 4
-GRAVITY = 5
-JUMP_SPEED = 6
+MOVEMENT_SPEED = 5
+GRAVITY = 10
+JUMP_SPEED =  15
 
 LEFT_VIEWPORT_MARGIN = 150
 RIGHT_VIEWPORT_MARGIN = 150
@@ -40,6 +41,7 @@ class Window(arcade.Window):
         self.dog_sprite = None
         self.dog_list = None
         self.wall_list = None
+        self.candy_list = None
 
         # Setting up the player
         self.left_pressed = False
@@ -50,6 +52,12 @@ class Window(arcade.Window):
 
         self.view_bottom = 0
         self.view_left = 0
+
+        self.score = 0
+
+        # sounds
+        self.collect_candy_sound = arcade.load_sound("sounds/coin1.wav")
+        self.jump_sound = arcade.load_sound("sounds/jump_11.wav")
 
         # set up score
         self.score = 0
@@ -72,6 +80,7 @@ class Window(arcade.Window):
         arcade.set_background_color(BACKGROUND_COLOR)
         self.dog_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
+        self.candy_list = arcade.SpriteList()
 
         self.dog_sprite = Dog("images/dog.png", scale=2)
         self.dog_sprite.center_x = 64
@@ -95,6 +104,12 @@ class Window(arcade.Window):
             wall = arcade.Sprite("images/RTS_Crate.png", TILE_SCALING)
             wall.position = coordinate
             self.wall_list.append(wall)
+
+        for x in range(0, 1250, 64):
+            candy = arcade.Sprite("images/eyecandy_1.png", CANDY_SCALING)
+            candy.center_x = x
+            candy.center_y = 96
+            self.candy_list.append(candy)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.wall_list, GRAVITY)
 
@@ -123,10 +138,11 @@ class Window(arcade.Window):
 
     def on_draw(self):
         """ Called when it is time to draw the world """
+        arcade.start_render()
+
         self.dog_list.draw()
         self.wall_list.draw()
-
-        arcade.start_render()
+        self.candy_list.draw()
 
         if self.current_state == INSTRUCTIONS_PAGE_0:
             self.draw_instructions_page(0)
@@ -158,7 +174,8 @@ class Window(arcade.Window):
         self.dog_list.update()
         self.physics_engine.update()
 
-     #   wall_hit_list = arcade.check_for_collision_with_list(self.dog_list, self.wall_list)
+        if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)) > 0:
+            self.draw_game_over()
 
        # for wall in wall_hit_list:
         #    self.score += 1
@@ -225,6 +242,7 @@ class Window(arcade.Window):
         if key == arcade.key.UP:
             if self.physics_engine.can_jump():
                 self.up_pressed = True
+                arcade.play_sound(self.jump_sound)
         elif key == arcade.key.LEFT:
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
@@ -268,6 +286,16 @@ def update(self, delta_time):
         if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
             wall.change_y *= -1
 
+    candy_hit_list = arcade.check_for_collision_with_list(self.dog_sprite,
+                                                         self.candy_list)
+
+    # Loop through each coin we hit (if any) and remove it
+    for candy in candy_hit_list:
+        # Remove the candy
+        candy.remove_from_sprite_lists()
+        # Play a sound
+        arcade.play_sound(self.collect_candy_sound)
+        self.score += 1
 
 class Dog(arcade.Sprite):
     def update(self):
