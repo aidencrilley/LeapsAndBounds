@@ -51,6 +51,9 @@ class Window(arcade.Window):
         self.view_bottom = 0
         self.view_left = 0
 
+        # set up score
+        self.score = 0
+
         self.instructions = []
         texture = arcade.load_texture("images/instructions_0.png")
         self.instructions.append(texture)
@@ -60,10 +63,18 @@ class Window(arcade.Window):
 
     def setup(self):
         """ Setup the game (or reset the game) """
+
+        self.view_bottom = 0
+        self.view_left = 0
+
+        self.score = 0
+
         arcade.set_background_color(BACKGROUND_COLOR)
         self.dog_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
+
         self.dog_sprite = Dog("images/dog.png", scale=2)
+        self.dog_sprite.center_x = 64
         self.dog_list.append(self.dog_sprite)
 
         # Creating the ground
@@ -73,12 +84,12 @@ class Window(arcade.Window):
             wall.center_y = 32
             self.wall_list.append(wall)
 
-        coordinate_list = [[256, random.randint(100, 500)],
-                           [356, random.randint(100, 500)],
-                           [456, random.randint(100, 500)],
-                           [556, random.randint(100, 500)],
-                           [656, random.randint(100, 500)],
-                           [756, random.randint(100, 500)]]
+        coordinate_list = [[256, random.randint(150, 450)],
+                           [356, random.randint(150, 450)],
+                           [456, random.randint(150, 450)],
+                           [556, random.randint(150, 450)],
+                           [656, random.randint(150, 450)],
+                           [756, random.randint(150, 450)]]
 
         for coordinate in coordinate_list:
             wall = arcade.Sprite("images/RTS_Crate.png", TILE_SCALING)
@@ -127,6 +138,9 @@ class Window(arcade.Window):
             self.draw_game()
             self.draw_game_over()
 
+        score_text = f"Score: {self.score}"
+        arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
+
     def on_update(self, delta_time):
         """ Called every frame of the game (1/GAME_SPEED times per second)"""
         self.dog_sprite.change_x = 0
@@ -143,6 +157,11 @@ class Window(arcade.Window):
 
         self.dog_list.update()
         self.physics_engine.update()
+
+     #   wall_hit_list = arcade.check_for_collision_with_list(self.dog_list, self.wall_list)
+
+       # for wall in wall_hit_list:
+        #    self.score += 1
 
         changed = False
 
@@ -248,6 +267,7 @@ def update(self, delta_time):
             wall.change_y *= -1
         if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
             wall.change_y *= -1
+
 
 class Dog(arcade.Sprite):
     def update(self):
