@@ -2,6 +2,7 @@ import random
 
 import arcade
 
+from Dog import *
 # Define constants
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
@@ -108,8 +109,8 @@ class Window(arcade.Window):
 
         for x in range(50):
             candy = arcade.Sprite("images/eyecandy_1.png", CANDY_SCALING)
-            candy.center_x = random.randrange(500)
-            candy.center_y = random.randrange(500)
+            candy.center_x = random.randrange(150, 500)
+            candy.center_y = random.randrange(150, 500)
             self.candy_list.append(candy)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.wall_list, GRAVITY)
@@ -299,18 +300,6 @@ def update(self, delta_time):
             wall.change_y *= -1
         if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
             wall.change_y *= -1
-
-
-class Dog(arcade.Sprite):
-    def update(self):
-        self.center_x += self.change_x
-        self.center_y += self.change_y
-
-        if self.bottom < 0:
-            self.bottom = 0
-        elif self.top > WINDOW_HEIGHT - 1:
-            self.top = WINDOW_HEIGHT - 1
-
 
 def main():
     window = Window()
