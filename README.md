@@ -1,8 +1,25 @@
-# LeapsAndBounds
-A simple platformer game based on the arcade module in Python
+# Final Project
+Title: Doggo Game
+-
+### Game Description
+-  Do not touch the lava by jumping on the crates
+ and earn points by collecting candies
 
+## Preview
 
-Fun dog game
+## Installation
+- install the requirements.txt file in the terminal:
+```> pip install -r requirements.txt```
+- run main.py as the main game:
+```> python main.py```
+## Instructions
 
-Credits:
-arcade.academy, opengameart.org
+## Authors
+- Aiden Crilley (*aidencri@udel.edu*)
+- Joshua Tyles (*jtyles@udel.edu*)
+
+### Acknowledgements:
+- arcade.academy
+    - http://arcade.academy/examples/platform_tutorial/index.html
+    - http://arcade.academy/examples/instruction_and_game_over_screens.html
+- opengameart.org
