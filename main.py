@@ -50,6 +50,7 @@ class Window(arcade.Window):
         self.up_pressed = False
         self.down_pressed = False
         self.physics_engine = None
+        self.game_over = False
 
         self.view_bottom = 0
         self.view_left = 0
@@ -227,6 +228,9 @@ class Window(arcade.Window):
                                 self.view_bottom,
                                 WINDOW_HEIGHT + self.view_bottom)
 
+        if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)) > 0:
+            self.current_state == GAME_OVER
+
     def on_mouse_press(self, x, y, button, modifiers):
         """
         Called when the user presses a mouse button.
@@ -308,7 +312,7 @@ def main():
     window = Window()
     window.setup()
     arcade.run()
-
+# test
 
 if __name__ == "__main__":
     main()
