@@ -63,6 +63,7 @@ class Window(arcade.Window):
         # set up score
         self.score = 0
 
+        # Initializing instructions pages
         self.instructions = []
         texture = arcade.load_texture("images/instructions_0.png")
         self.instructions.append(texture)
@@ -95,17 +96,19 @@ class Window(arcade.Window):
             wall.center_y = 32
             self.wall_list.append(wall)
 
-        coordinate_list = [[256, random.randint(150, 450)],
-                           [356, random.randint(150, 450)],
-                           [456, random.randint(150, 450)],
-                           [556, random.randint(150, 450)],
-                           [656, random.randint(150, 450)],
-                           [756, random.randint(150, 450)]]
+        coordinate_list = [[random.randint(100, 10000), random.randint(150, 450)],
+                           [random.randint(100, 10000), random.randint(150, 450)],
+                           [random.randint(100, 10000), random.randint(150, 450)]]
+
+        x = 0
+        while x < 100:
+            coordinate_list.append([random.randint(500, 10000), random.randint(150, 450)])
+            x += 1
 
         for coordinate in coordinate_list:
-            wall = arcade.Sprite("images/RTS_Crate.png", TILE_SCALING)
-            wall.position = coordinate
-            self.wall_list.append(wall)
+            crate = arcade.Sprite("images/RTS_Crate.png", TILE_SCALING)
+            crate.position = coordinate
+            self.wall_list.append(crate)
 
         for x in range(50):
             candy = arcade.Sprite("images/eyecandy_1.png", CANDY_SCALING)
