@@ -91,7 +91,7 @@ class Window(arcade.Window):
 
         # Creating the ground
         for x in range(0, 50000, 64):
-            wall = arcade.Sprite("images/grass.png", SPRITE_SCALING)
+            wall = arcade.Sprite("images/fire.png", scale=0.5)
             wall.center_x = x
             wall.center_y = 32
             self.wall_list.append(wall)
@@ -110,10 +110,10 @@ class Window(arcade.Window):
             crate.position = coordinate
             self.wall_list.append(crate)
 
-        for x in range(50):
+        for x in range(10000):
             candy = arcade.Sprite("images/eyecandy_1.png", CANDY_SCALING)
-            candy.center_x = random.randrange(150, 500)
-            candy.center_y = random.randrange(150, 500)
+            candy.center_x = random.randrange(150, 10000)
+            candy.center_y = random.randrange(150, 10000)
             self.candy_list.append(candy)
 
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.dog_sprite, self.wall_list, GRAVITY)
@@ -143,7 +143,7 @@ class Window(arcade.Window):
         self.candy_list.draw()
 
         score_text = f"Score: {self.score}"
-        arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.WHITE, 18)
+        arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom, arcade.csscolor.BLACK, 18)
 
     def on_draw(self):
         """ Called when it is time to draw the world """
