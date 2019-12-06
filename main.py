@@ -91,7 +91,7 @@ class Window(arcade.Window):
         self.dog_list.append(self.dog_sprite)
 
         # Creating the ground
-        for x in range(0, 50000, 64):
+        for x in range(-1000, 50000, 64):
             wall = arcade.Sprite("images/fire.png", scale=0.5)
             wall.center_x = x
             wall.center_y = 32
@@ -206,7 +206,7 @@ class Window(arcade.Window):
             changed = True
 
         # Scroll up
-        top_boundary = self.view_bottom + WINDOW_HEIGHT - TOP_VIEWPORT_MARGIN
+        top_boundary = self.view_bottom + WINDOW_HEIGHT
         if self.dog_sprite.top > top_boundary:
             self.view_bottom += self.dog_sprite.top - top_boundary
             changed = True
