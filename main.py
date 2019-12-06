@@ -97,7 +97,8 @@ class Window(arcade.Window):
             wall.center_y = 32
             self.wall_list.append(wall)
 
-        coordinate_list = [[random.randint(100, 10000), random.randint(150, 450)],
+        coordinate_list = [[64, 175],
+                           [random.randint(100, 10000), random.randint(150, 450)],
                            [random.randint(100, 10000), random.randint(150, 450)],
                            [random.randint(100, 10000), random.randint(150, 450)]]
 
