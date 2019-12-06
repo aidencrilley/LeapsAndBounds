@@ -3,6 +3,7 @@ import random
 import arcade
 
 from Dog import *
+
 # Define constants
 WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 500
@@ -29,6 +30,17 @@ LEFT_VIEWPORT_MARGIN = 150
 RIGHT_VIEWPORT_MARGIN = 150
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
+
+
+def draw_game_over():
+    """
+    Draw "Game over" across the screen.
+    """
+    output = "Game Over"
+    arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
+
+    output = "Click to restart"
+    arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
 
 
 class Window(arcade.Window):
@@ -87,7 +99,7 @@ class Window(arcade.Window):
         self.candy_list = arcade.SpriteList()
 
         self.dog_sprite = Dog("images/dog.png", scale=2)
-        self.dog_sprite.center_x = 64
+        self.dog_sprite.center_x = 250
         self.dog_list.append(self.dog_sprite)
 
         # Creating the ground
@@ -97,10 +109,10 @@ class Window(arcade.Window):
             wall.center_y = 32
             self.wall_list.append(wall)
 
-        coordinate_list = [[64, 175],
-                           [random.randint(100, 10000), random.randint(150, 450)],
-                           [random.randint(100, 10000), random.randint(150, 450)],
-                           [random.randint(100, 10000), random.randint(150, 450)]]
+        coordinate_list = [[250, 175],
+                           [random.randint(300, 10000), random.randint(150, 450)],
+                           [random.randint(300, 10000), random.randint(150, 450)],
+                           [random.randint(300, 10000), random.randint(150, 450)]]
 
         x = 0
         while x < 100:
@@ -129,16 +141,6 @@ class Window(arcade.Window):
                                       page_texture.width,
                                       page_texture.height, page_texture, 0)
 
-    def draw_game_over(self):
-        """
-        Draw "Game over" across the screen.
-        """
-        output = "Game Over"
-        arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
-
-        output = "Click to restart"
-        arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
-
     def draw_game(self):
         self.dog_list.draw()
         self.wall_list.draw()
@@ -151,10 +153,6 @@ class Window(arcade.Window):
         """ Called when it is time to draw the world """
         arcade.start_render()
 
-        self.dog_list.draw()
-        self.wall_list.draw()
-        self.candy_list.draw()
-
         if self.current_state == INSTRUCTIONS_PAGE_0:
             self.draw_instructions_page(0)
         elif self.current_state == INSTRUCTIONS_PAGE_1:
@@ -163,7 +161,7 @@ class Window(arcade.Window):
             self.draw_game()
         else:
             self.draw_game()
-            self.draw_game_over()
+            draw_game_over()
 
     def on_update(self, delta_time):
         """ Called every frame of the game (1/GAME_SPEED times per second)"""
@@ -229,8 +227,8 @@ class Window(arcade.Window):
                                 self.view_bottom,
                                 WINDOW_HEIGHT + self.view_bottom)
 
-        if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)) > 0:
-            self.current_state == GAME_OVER
+        '''if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)):
+            self.current_state = GAME_OVER'''
 
     def on_mouse_press(self, x, y, button, modifiers):
         """
@@ -272,34 +270,12 @@ class Window(arcade.Window):
             self.right_pressed = False
 
 
-def on_mouse_press(self, x, y, button, modifiers):
-    if self.current_state == INSTRUCTIONS_PAGE_0:
-        self.current_state = INSTRUCTIONS_PAGE_1
-    elif self.current_state == INSTRUCTIONS_PAGE_1:
-        self.setup()
-        self.current_state = GAME_RUNNING
-    elif self.current_state == GAME_OVER:
-        self.setup()
-        self.current_state = GAME_RUNNING
-
-
 def update(self, delta_time):
     if self.current_state == GAME_RUNNING:
         self.dog_list.update()
         self.candy_list.update()
 
-        hit_list = arcade.check_for_collision_with_list(self.dog_sprite, self.candy_list)
-
-        # Loop through each coin we hit (if any) and remove it
-        for candy in hit_list:
-            # Remove the candy
-            candy.kill()
-            # Play a sound
-            arcade.play_sound(self.collect_candy_sound)
-            self.score += 1
-
-    for wall in self.wall_list:
-
+    '''for wall in self.wall_list:
         if wall.boundary_right and wall.right > wall.boundary_right and wall.change_x > 0:
             wall.change_x *= -1
         if wall.boundary_left and wall.left < wall.boundary_left and wall.change_x < 0:
@@ -307,12 +283,18 @@ def update(self, delta_time):
         if wall.boundary_top and wall.top > wall.boundary_top and wall.change_y > 0:
             wall.change_y *= -1
         if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
-            wall.change_y *= -1
+            wall.change_y *= -1'''
+
+    if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)):
+        self.current_state = GAME_OVER
+
 
 def main():
     window = Window()
     window.setup()
     arcade.run()
+
+
 # test
 
 if __name__ == "__main__":
