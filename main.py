@@ -67,6 +67,8 @@ class Window(arcade.Window):
         self.view_bottom = 0
         self.view_left = 0
 
+        self.endgame = False
+
         self.score = 0
 
         # sounds
@@ -227,9 +229,6 @@ class Window(arcade.Window):
                                 self.view_bottom,
                                 WINDOW_HEIGHT + self.view_bottom)
 
-        '''if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)):
-            self.current_state = GAME_OVER'''
-
     def on_mouse_press(self, x, y, button, modifiers):
         """
         Called when the user presses a mouse button.
@@ -284,9 +283,6 @@ def update(self, delta_time):
             wall.change_y *= -1
         if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
             wall.change_y *= -1'''
-
-    if len(arcade.check_for_collision_with_list(self.dog_sprite, self.wall_list)):
-        self.current_state = GAME_OVER
 
 
 def main():

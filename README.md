@@ -13,6 +13,10 @@ Title: Doggo Game
 - run main.py as the main game:
 ```> python main.py```
 ## Instructions
+- Use the arrow keys to move around and jump
+- Collect candy to earn points (1 point per candy)
+- Do not fall in the lava!
+- Good luck!
 
 ## Authors
 - Aiden Crilley (*aidencri@udel.edu*)
