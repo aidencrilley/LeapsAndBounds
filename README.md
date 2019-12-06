@@ -4,8 +4,8 @@ Title: Doggo Game
 ### Game Description
 -  Do not touch the lava by jumping on the crates
  and earn points by collecting candies
-
-## Preview
+ - Link to game:
+ - https://www.youtube.com/watch?v=eHtNyGigSAU
 
 ## Installation
 - install the requirements.txt file in the terminal:
